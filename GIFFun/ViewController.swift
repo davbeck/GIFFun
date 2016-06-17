@@ -9,16 +9,27 @@
 import UIKit
 import SlackTextViewController
 import MobileCoreServices
+import FLAnimatedImage
+
+
+extension FLAnimatedImage {
+	convenience init?(named: String) {
+		guard let url = NSBundle.mainBundle().URLForResource(named, withExtension: "gif") else { return nil }
+		guard let data = NSData(contentsOfURL: url) else { return nil }
+		
+		self.init(animatedGIFData: data)
+	}
+}
 
 
 class ViewController: SLKTextViewController {
 	var messages = [
 		Message(body: Message.randomBody()),
-		Message(photo: UIImage(named: "image-1.gif")),
+		Message(photo: .animatedImage(FLAnimatedImage(named: "image-1")!)),
 		Message(body: Message.randomBody()),
 		Message(body: Message.randomBody()),
-		Message(photo: UIImage(named: "image-2.gif")),
-		Message(photo: UIImage(named: "image-3.gif")),
+		Message(photo: .animatedImage(FLAnimatedImage(named: "image-2")!)),
+		Message(photo: .animatedImage(FLAnimatedImage(named: "image-3")!)),
 		Message(body: Message.randomBody()),
 		Message(body: Message.randomBody()),
 		Message(body: Message.randomBody()),
@@ -66,7 +77,15 @@ class ViewController: SLKTextViewController {
 		
 		cell.nameLabel.text = message.senderName
 		cell.bodyLabel.text = message.body
-		cell.photoView.image = message.photo
+		if let photo = message.photo {
+			switch photo {
+			case .image(let image):
+				cell.photoView.animatedImage = nil
+				cell.photoView.image = image
+			case .animatedImage(let animatedImage):
+				cell.photoView.animatedImage = animatedImage
+			}
+		}
 		
 		cell.transform = self.tableView!.transform
 		return cell
@@ -81,9 +100,15 @@ class ViewController: SLKTextViewController {
 		attributedText.enumerateAttributesInRange(NSRange(location: 0, length: self.textView.attributedText.length), options: []) { (attributes, range, stop) in
 			if let attachment = attributes[NSAttachmentAttributeName] as? NSTextAttachment {
 				guard let contents = attachment.contents ?? attachment.fileWrapper?.regularFileContents else { return } // block continue
-				guard let image = UIImage(data: contents) else { return } // block continue
 				
-				let message = Message(senderName: "You", photo: image)
+				let photo: Message.Photo
+				if attachment.fileType == kUTTypeGIF as String {
+					photo = .animatedImage(FLAnimatedImage(animatedGIFData: contents))
+				} else {
+					photo = .image(UIImage(data: contents)!)
+				}
+				
+				let message = Message(senderName: "You", photo: photo)
 				messages.append(message)
 			} else {
 				// because we add in line breaks to put each photo on it's own line, we need to trim that out of the text

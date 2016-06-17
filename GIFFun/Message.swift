@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import FLAnimatedImage
 
 
 extension Array {
@@ -36,11 +37,17 @@ class Message {
 	}
 	
 	
+	
+	enum Photo {
+		case image(UIImage)
+		case animatedImage(FLAnimatedImage)
+	}
+	
 	let senderName: String
 	let body: String?
-	let photo: UIImage?
+	let photo: Photo?
 	
-	init(senderName: String = Message.randomName(), body: String? = nil, photo: UIImage? = nil) {
+	init(senderName: String = Message.randomName(), body: String? = nil, photo: Photo? = nil) {
 		self.senderName = senderName
 		self.body = body
 		self.photo = photo
