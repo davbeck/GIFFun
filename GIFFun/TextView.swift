@@ -43,6 +43,8 @@ class TextAttachment: NSTextAttachment {
 
 
 class TextView: SLKTextView {
+	// MARK: - Paste support
+	
 	override func canPerformAction(action: Selector, withSender sender: AnyObject?) -> Bool {
 		// if it's an action our superclasss can handle, let it
 		if super.canPerformAction(action, withSender: sender) {
@@ -102,5 +104,106 @@ class TextView: SLKTextView {
 			// all other pasted content can be handled by our superclass
 			super.paste(sender)
 		}
+	}
+	
+	
+	// MARK: - Auto Paste
+	
+	// because NSTimer retains it's target, we need to have a weak link back to ourself
+	private class PasteboardWatcher: NSObject {
+		weak var textView: TextView?
+		init(textView: TextView) {
+			super.init()
+			
+			self.textView = textView
+		}
+		
+		var lastChangeCount: Int = UIPasteboard.generalPasteboard().changeCount
+		
+		@objc func checkPasteboardChanged() {
+			guard UIPasteboard.generalPasteboard().changeCount > self.lastChangeCount else { return }
+			self.lastChangeCount = UIPasteboard.generalPasteboard().changeCount
+			
+			guard UIPasteboard.generalPasteboard().containsPasteboardTypes([ kUTTypeGIF as String ]) else { return }
+			
+			// let our paste action handle inserting the new image
+			textView?.paste(nil)
+		}
+	}
+	
+	
+	private lazy var pasteboardWatcher: PasteboardWatcher = PasteboardWatcher(textView: self)
+	private var pasteboardTimer: NSTimer? {
+		didSet {
+			oldValue?.invalidate()
+		}
+	}
+	
+	private func scheduleTimer() {
+		pasteboardTimer = NSTimer.scheduledTimerWithTimeInterval(1, target: pasteboardWatcher, selector: #selector(PasteboardWatcher.checkPasteboardChanged), userInfo: nil, repeats: true)
+	}
+	
+	private func invalidateTimer() {
+		pasteboardTimer = nil
+	}
+	
+	
+	deinit {
+		invalidateTimer()
+	}
+	
+	private func commonInit() {
+		self.typingAttributes = [
+			NSFontAttributeName : UIFont.preferredFontForTextStyle(UIFontTextStyleBody),
+		]
+		
+		// this only gets fired when something is copied from within the app
+		NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(pasteboardChanged), name: UIPasteboardChangedNotification, object: UIPasteboard.generalPasteboard())
+		
+		// turn our timer on and off when the app is closed and opened
+		// we don't want our timer to fire while we are launching
+		NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(applicationDidBecomeActive), name: UIApplicationDidBecomeActiveNotification, object: nil)
+		NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(applicationWillResignActive), name: UIApplicationWillResignActiveNotification, object: nil)
+		
+		// we only want our timer to fire when we are active as a text field
+		NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(textViewTextDidBeginEditing), name: UITextViewTextDidBeginEditingNotification, object: self)
+		NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(textViewTextDidEndEditing), name: UITextViewTextDidEndEditingNotification, object: self)
+	}
+	
+	override init(frame: CGRect, textContainer: NSTextContainer?) {
+		super.init(frame: frame, textContainer: textContainer)
+		
+		commonInit()
+	}
+	
+	required init?(coder: NSCoder) {
+		super.init(coder: coder)
+		
+		commonInit()
+	}
+	
+	
+	func pasteboardChanged(notification: NSNotification) {
+		pasteboardWatcher.lastChangeCount = UIPasteboard.generalPasteboard().changeCount
+	}
+	
+	func applicationDidBecomeActive(notification: NSNotification) {
+		pasteboardWatcher.lastChangeCount = UIPasteboard.generalPasteboard().changeCount
+		
+		scheduleTimer()
+	}
+	
+	func applicationWillResignActive(notification: NSNotification) {
+		invalidateTimer()
+	}
+	
+	func textViewTextDidBeginEditing(notification: NSNotification) {
+		pasteboardWatcher.lastChangeCount = UIPasteboard.generalPasteboard().changeCount
+		
+		scheduleTimer()
+	}
+	
+	func textViewTextDidEndEditing(notification: NSNotification) {
+		invalidateTimer()
 	}
 }
