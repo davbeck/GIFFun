@@ -8,6 +8,7 @@
 
 import UIKit
 import SlackTextViewController
+import MobileCoreServices
 
 
 class ViewController: SLKTextViewController {
@@ -40,6 +41,7 @@ class ViewController: SLKTextViewController {
 	}
 	
 	private func commonInit() {
+		self.registerClassForTextView(TextView.self)
 		self.textInputbar.autoHideRightButton = false
 	}
 	
@@ -73,14 +75,40 @@ class ViewController: SLKTextViewController {
 	
 	// MARK: - SLKTextViewController
 	
+	private func messagesWithAttributedString(attributedText: NSAttributedString) -> [Message] {
+		var messages = [Message]()
+		
+		attributedText.enumerateAttributesInRange(NSRange(location: 0, length: self.textView.attributedText.length), options: []) { (attributes, range, stop) in
+			if let attachment = attributes[NSAttachmentAttributeName] as? NSTextAttachment {
+				guard let contents = attachment.contents ?? attachment.fileWrapper?.regularFileContents else { return } // block continue
+				guard let image = UIImage(data: contents) else { return } // block continue
+				
+				let message = Message(senderName: "You", photo: image)
+				messages.append(message)
+			} else {
+				// because we add in line breaks to put each photo on it's own line, we need to trim that out of the text
+				let body = attributedText.attributedSubstringFromRange(range).string.stringByTrimmingCharactersInSet(.whitespaceAndNewlineCharacterSet())
+				
+				// text between images may just be whitespace, and can be ignored
+				guard !body.isEmpty else { return } // block continue
+				
+				let message = Message(senderName: "You", body: body)
+				messages.append(message)
+			}
+		}
+		
+		return messages
+	}
+	
 	override func didPressRightButton(sender: AnyObject?) {
 		self.textView.refreshFirstResponder()
 		
-		let message = Message(senderName: "You", body: self.textView.text)
-		self.messages.insert(message, atIndex: 0)
+		// reversing because we show the newest images at the bottom, but we are inversed, so they need to be at index 0
+		let messages = messagesWithAttributedString(self.textView.attributedText).reverse()
+		self.messages.insertContentsOf(messages, at: 0)
 		
-		let indexPath = NSIndexPath(forRow: 0, inSection: 0)
-		self.tableView?.insertRowsAtIndexPaths([indexPath], withRowAnimation: .None)
+		let indexPaths = (0..<messages.count).map({ NSIndexPath(forRow: $0, inSection: 0) })
+		self.tableView?.insertRowsAtIndexPaths(indexPaths, withRowAnimation: .None)
 		
 		super.didPressRightButton(sender)
 	}

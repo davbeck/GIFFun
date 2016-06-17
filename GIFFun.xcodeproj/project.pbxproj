@@ -18,6 +18,7 @@
 		11E03D431D13C7390096262C /* image-2.gif in Resources */ = {isa = PBXBuildFile; fileRef = 11E03D411D13C7390096262C /* image-2.gif */; };
 		11E03D441D13C7390096262C /* image-3.gif in Resources */ = {isa = PBXBuildFile; fileRef = 11E03D421D13C7390096262C /* image-3.gif */; };
 		11E03D461D142F220096262C /* AspectImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11E03D451D142F220096262C /* AspectImageView.swift */; };
+		11E03D481D1433850096262C /* TextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11E03D471D1433850096262C /* TextView.swift */; };
 		232BA8AE27BB57EC09200E73 /* Pods_GIFFun.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6B844197FFDB5792C4C192BA /* Pods_GIFFun.framework */; };
 /* End PBXBuildFile section */
 
@@ -35,6 +36,7 @@
 		11E03D411D13C7390096262C /* image-2.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = "image-2.gif"; sourceTree = "<group>"; };
 		11E03D421D13C7390096262C /* image-3.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = "image-3.gif"; sourceTree = "<group>"; };
 		11E03D451D142F220096262C /* AspectImageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AspectImageView.swift; sourceTree = "<group>"; };
+		11E03D471D1433850096262C /* TextView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextView.swift; sourceTree = "<group>"; };
 		6A2762533DBEE8E3416BBFED /* Pods-GIFFun.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GIFFun.debug.xcconfig"; path = "Pods/Target Support Files/Pods-GIFFun/Pods-GIFFun.debug.xcconfig"; sourceTree = "<group>"; };
 		6B844197FFDB5792C4C192BA /* Pods_GIFFun.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_GIFFun.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		BC7C2932EA36ADC4FD823A60 /* Pods-GIFFun.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GIFFun.release.xcconfig"; path = "Pods/Target Support Files/Pods-GIFFun/Pods-GIFFun.release.xcconfig"; sourceTree = "<group>"; };
@@ -75,6 +77,7 @@
 			children = (
 				11A3F6751D13ADC300B6B972 /* AppDelegate.swift */,
 				11A3F6771D13ADC300B6B972 /* ViewController.swift */,
+				11E03D471D1433850096262C /* TextView.swift */,
 				11E03D3B1D13BADD0096262C /* MessageCell.swift */,
 				11E03D451D142F220096262C /* AspectImageView.swift */,
 				11E03D3D1D13BC830096262C /* Message.swift */,
@@ -234,6 +237,7 @@
 				11E03D3C1D13BADD0096262C /* MessageCell.swift in Sources */,
 				11E03D461D142F220096262C /* AspectImageView.swift in Sources */,
 				11E03D3E1D13BC830096262C /* Message.swift in Sources */,
+				11E03D481D1433850096262C /* TextView.swift in Sources */,
 				11A3F6781D13ADC300B6B972 /* ViewController.swift in Sources */,
 				11A3F6761D13ADC300B6B972 /* AppDelegate.swift in Sources */,
 			);
