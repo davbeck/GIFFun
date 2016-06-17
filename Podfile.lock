@@ -1,0 +1,15 @@
+PODS:
+  - FLAnimatedImage (1.0.12)
+  - SlackTextViewController (1.9.3)
+
+DEPENDENCIES:
+  - FLAnimatedImage
+  - SlackTextViewController
+
+SPEC CHECKSUMS:
+  FLAnimatedImage: 4a0b56255d9b05f18b6dd7ee06871be5d3b89e31
+  SlackTextViewController: bd2a34c188d4f7dec93cf42388f38551263fac82
+
+PODFILE CHECKSUM: 7281d111a348c20361d01d31761c5fb681e34e4b
+
+COCOAPODS: 1.0.1
